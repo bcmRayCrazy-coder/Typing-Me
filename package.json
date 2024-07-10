@@ -2,11 +2,11 @@
     "name": "typing-me-server",
     "version": "1.0.0",
     "description": "Server-side for Typing Me",
-    "main": "main.js",
+    "main": "server.js",
     "author": "bcmray",
     "license": "MIT",
     "scripts": {
-        "start": "node main.js"
+        "start": "node server.js"
     },
     "dependencies": {
         "fastify": "^4.28.1",
