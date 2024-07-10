@@ -760,7 +760,7 @@ function animateStat(element, start, end, duration) {
 
 function antiCheat() {
     setInterval(() => {
-        // debugger;
+        debugger;
     }, 1);
 }
 
