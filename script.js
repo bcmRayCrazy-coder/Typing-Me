@@ -184,7 +184,6 @@ let subtitleAnimationInterval;
 let showPinyin = true;
 let currentTheme = 'auto';
 
-// Disable copy and paste
 document.addEventListener('copy', (e) => e.preventDefault());
 document.addEventListener('paste', (e) => e.preventDefault());
 inputField.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -210,7 +209,6 @@ function startGame() {
   roundDisplay.textContent = roundsCompleted + 1;
   stopSubtitleAnimation();
 
-  // Add smooth transition for game start
   textDisplay.style.opacity = '0';
   pinyinDisplay.style.opacity = '0';
   setTimeout(() => {
@@ -255,7 +253,6 @@ function pauseGame() {
     pauseBtn.style.backgroundColor = 'var(--warning-color)';
   }
 
-  // Add pause/resume animation
   textDisplay.style.filter = isPaused ? 'blur(3px)' : 'blur(0)';
   textDisplay.style.transition = 'filter 0.3s ease';
 }
@@ -287,7 +284,6 @@ function resetGame() {
   lastTextIndex = -1;
   startSubtitleAnimation();
 
-  // Add reset animation
   textDisplay.style.transform = 'scale(0.9)';
   textDisplay.style.opacity = '0';
   setTimeout(() => {
@@ -336,7 +332,6 @@ function showSuccessAnimation() {
   successOverlay.style.opacity = '1';
   successOverlay.style.pointerEvents = 'auto';
 
-  // Create and animate confetti
   for (let i = 0; i < 100; i++) {
     createConfetti();
   }
@@ -352,7 +347,6 @@ function showFailureAnimation() {
   failureOverlay.style.opacity = '1';
   failureOverlay.style.pointerEvents = 'auto';
 
-  // Shake animation for text display
   textDisplay.style.animation = 'shake 0.5s ease-in-out';
 
   setTimeout(() => {
@@ -396,7 +390,6 @@ function updateWPMDisplay(wpm) {
   } else {
     wpmDisplay.style.color = 'var(--success-color)';
   }
-  // Add WPM update animation
   wpmDisplay.style.transform = 'scale(1.2)';
   setTimeout(() => {
     wpmDisplay.style.transform = 'scale(1)';
@@ -421,7 +414,6 @@ function updateAccuracyDisplay(accuracy) {
   } else {
     accuracyDisplay.style.color = 'var(--success-color)';
   }
-  // Add accuracy update animation
   accuracyDisplay.style.transform = 'scale(1.2)';
   setTimeout(() => {
     accuracyDisplay.style.transform = 'scale(1)';
@@ -440,7 +432,6 @@ function updateTimeDisplay() {
     timeDisplay.style.color = 'var(--success-color)';
     timeDisplay.classList.remove('pulse');
   }
-  // Add time update animation
   timeDisplay.style.transform = 'scale(1.1)';
   setTimeout(() => {
     timeDisplay.style.transform = 'scale(1)';
@@ -597,16 +588,13 @@ function applyTheme() {
   } else if (currentTheme === 'dark') {
     document.body.classList.add('dark-mode');
   }
-  // Add theme change animation
   document.body.style.transition = 'background-color 0.5s ease, color 0.5s ease';
 }
 
-// Initialize the game
 updateUILanguage();
 applyTheme();
 resetGame();
 
-// Add smooth scrolling for better user experience
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function (e) {
     e.preventDefault();
@@ -616,7 +604,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Add keyboard shortcuts
 document.addEventListener('keydown', function (event) {
   if (event.ctrlKey || event.metaKey) {
     switch (event.key) {
