@@ -1,11 +1,13 @@
-const fastify = require('fastify')({ logger: true });
+// Max Cheat time (ms)
+const CheatTime = 5999;
 
-const dbPath = require('path').join(__dirname, './db.sqlite');
-console.log('Database path', dbPath);
+const fastify = require('fastify')({ logger: true });
+const path = require('path');
+
 const knex = require('knex')({
     client: 'sqlite3',
     connection: {
-        filename: dbPath,
+        filename: path.join(__dirname, './db.sqlite'),
     },
     pool: {
         min: 0,
@@ -15,32 +17,34 @@ const knex = require('knex')({
 });
 
 async function initDatabase() {
+    console.log('Database init');
     if (!(await knex.schema.hasTable('ranks'))) {
         console.log('Create ranks table');
         await knex.schema.createTable('ranks', (builder) => {
             builder.increments('id');
             builder.string('username');
-            builder.timestamp('time');
+            builder.integer('wpm');
             builder.string('text');
             builder.timestamp('upload_time').defaultTo(knex.fn.now());
         });
     }
-    console.log(await knex.schema.hasTable('ranks'));
-    console.log(await knex.schema.hasTable('cheats'));
     if (!(await knex.schema.hasTable('cheats'))) {
         console.log('Create cheats table');
         await knex.schema.createTable('cheats', (builder) => {
             builder.increments('id');
             builder.string('username');
-            builder.timestamp('time');
+            builder.integer('wpm');
             builder.timestamp('upload_time').defaultTo(knex.fn.now());
         });
     }
-    console.log('Database init');
 }
 
 function initWeb() {
-    fastify.get('/', (request, reply) => {
+    fastify.register(require('@fastify/static'), {
+        root: path.join(__dirname, '/static'),
+    });
+
+    fastify.post('/', (request, reply) => {
         return { ok: true };
     });
 
@@ -70,19 +74,22 @@ function initWeb() {
         },
         async (request, reply) => {
             const { name: username, time, text } = request.body;
-            if (request.body.time <= 10000) {
+            const wpm = Math.round((text.length / time) * 12000);
+            if (request.body.time <= CheatTime) {
                 await knex
                     .insert({
                         username,
-                        time,
+                        wpm,
+                        upload_time: new Date().getTime(),
                     })
                     .into('cheats');
             } else {
                 await knex
                     .insert({
                         username,
-                        time,
+                        wpm,
                         text,
+                        upload_time: new Date().getTime(),
                     })
                     .into('ranks');
             }
@@ -104,7 +111,7 @@ function initWeb() {
                         offset: {
                             type: 'number',
                         },
-                        orderdesc: {
+                        orderAsc: {
                             type: 'boolean',
                         },
                         cheat: {
@@ -118,7 +125,7 @@ function initWeb() {
             var query = knex
                 .select('*')
                 .from(request.query.cheat ? 'cheats' : 'ranks')
-                .orderBy('time', request.query.orderDesc ? 'desc' : 'asc');
+                .orderBy('wpm', request.query.orderAsc ? 'asc' : 'desc');
             if (request.query.limit) query.limit(request.query.limit);
             if (request.query.offset) query.offset(request.query.offset);
             return await query;
