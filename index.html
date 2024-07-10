@@ -89,9 +89,13 @@
         <div id="name-modal" class="modal">
             <div class="modal-content">
                 <h2>Your name</h2>
-                <div class="setting-item">
+                <div class="name-item">
                     <label for="name-field">Please enter your name</label>
-                    <input type="text" id="name-field" />
+                    <input type="text" id="name-field" placeholder="Enter your name here" maxlength="24" />
+                    <div class="btn-group">
+                        <button id="guest-btn" class="btn">Guest Mode</button>
+                        <button id="confirm-btn" class="btn" disabled>Confirm</button>
+                    </div>
                 </div>
             </div>
         </div>

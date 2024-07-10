@@ -7,6 +7,8 @@ const pauseBtn = document.querySelector('#pause-btn');
 const resetBtn = document.querySelector('#reset-btn');
 const settingsBtn = document.querySelector('#settings-btn');
 const settingsCloseBtn = settingsModal.querySelector('.close');
+const guestBtn = document.querySelector('#guest-btn');
+const confirmNameBtn = document.querySelector('#confirm-btn');
 // Displays
 const title = document.querySelector('#title');
 const subtitle = document.querySelector('#subtitle');
@@ -26,6 +28,7 @@ const showPinyinCheckbox = document.querySelector('#show-pinyin');
 const timeLimitInput = document.querySelector('#time-limit');
 const themeSelect = document.querySelector('#theme-select');
 const inputField = document.querySelector('#input-field');
+const nameField = document.querySelector('#name-field');
 // Popups
 const failureOverlay = document.querySelector('#failure-overlay');
 const failureMessage = document.querySelector('#failure-message');
@@ -273,6 +276,7 @@ let lastTextIndex = -1;
 let subtitleAnimationInterval;
 let showPinyin = true;
 let currentTheme = 'auto';
+let username = '';
 
 document.addEventListener('copy', (e) => e.preventDefault());
 document.addEventListener('paste', (e) => e.preventDefault());
@@ -288,6 +292,29 @@ function closeModal(element) {
     setTimeout(() => {
         element.style.display = 'none';
     }, 300);
+}
+
+function updateUILanguage() {
+    title.textContent = uiText[currentLanguage].title;
+    startBtn.textContent = uiText[currentLanguage].start;
+    pauseBtn.textContent = uiText[currentLanguage].pause;
+    resetBtn.textContent = uiText[currentLanguage].reset;
+    wpmLabel.textContent = uiText[currentLanguage].wpm;
+    accuracyLabel.textContent = uiText[currentLanguage].accuracy;
+    timeLabel.textContent = uiText[currentLanguage].timeLeft;
+    roundLabel.textContent = uiText[currentLanguage].round;
+    inputField.placeholder = uiText[currentLanguage].placeholder;
+    settingsBtn.textContent = uiText[currentLanguage].settings;
+    document.querySelector('label[for="show-pinyin"]').textContent =
+        uiText[currentLanguage].showPinyin;
+    document.querySelector('label[for="time-limit"]').textContent =
+        uiText[currentLanguage].timeLimit;
+    document.querySelector('label[for="theme-select"]').textContent =
+        uiText[currentLanguage].theme;
+    themeSelect.options[0].textContent = uiText[currentLanguage].auto;
+    themeSelect.options[1].textContent = uiText[currentLanguage].light;
+    themeSelect.options[2].textContent = uiText[currentLanguage].dark;
+    startSubtitleAnimation();
 }
 
 function startSubtitleAnimation() {
@@ -332,6 +359,30 @@ function startSubtitleAnimation() {
 function stopSubtitleAnimation() {
     clearInterval(subtitleAnimationInterval);
     subtitle.textContent = '';
+}
+
+function initUserWeb() {
+    guestBtn.addEventListener('click', function () {
+        closeModal(nameModal);
+        alert('Rank is not avaliable under guest mode');
+    });
+    confirmNameBtn.addEventListener('click', function () {
+        if (username.length <= 0 || username.length > 24)
+            return alert('Name too long or too short!');
+        closeModal(nameModal);
+    });
+
+    nameField.addEventListener('input', function () {
+        const newName = nameField.value.trim();
+        if (newName.length > 0 && newName.length <= 24) {
+            username = newName;
+            confirmNameBtn.disabled = false;
+        } else {
+            confirmNameBtn.disabled = true;
+        }
+    });
+
+    openModal(nameModal);
 }
 
 function initGame() {
@@ -642,29 +693,6 @@ function initGame() {
 }
 
 function initUI() {
-    function updateUILanguage() {
-        title.textContent = uiText[currentLanguage].title;
-        startBtn.textContent = uiText[currentLanguage].start;
-        pauseBtn.textContent = uiText[currentLanguage].pause;
-        resetBtn.textContent = uiText[currentLanguage].reset;
-        wpmLabel.textContent = uiText[currentLanguage].wpm;
-        accuracyLabel.textContent = uiText[currentLanguage].accuracy;
-        timeLabel.textContent = uiText[currentLanguage].timeLeft;
-        roundLabel.textContent = uiText[currentLanguage].round;
-        inputField.placeholder = uiText[currentLanguage].placeholder;
-        settingsBtn.textContent = uiText[currentLanguage].settings;
-        document.querySelector('label[for="show-pinyin"]').textContent =
-            uiText[currentLanguage].showPinyin;
-        document.querySelector('label[for="time-limit"]').textContent =
-            uiText[currentLanguage].timeLimit;
-        document.querySelector('label[for="theme-select"]').textContent =
-            uiText[currentLanguage].theme;
-        themeSelect.options[0].textContent = uiText[currentLanguage].auto;
-        themeSelect.options[1].textContent = uiText[currentLanguage].light;
-        themeSelect.options[2].textContent = uiText[currentLanguage].dark;
-        startSubtitleAnimation();
-    }
-
     settingsBtn.onclick = function () {
         openModal(settingsModal);
     };
@@ -760,10 +788,11 @@ function animateStat(element, start, end, duration) {
 
 function antiCheat() {
     setInterval(() => {
-        debugger;
+        // debugger;
     }, 1);
 }
 
+initUserWeb();
 initGame();
 initUI();
 antiCheat();
