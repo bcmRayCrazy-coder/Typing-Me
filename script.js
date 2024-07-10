@@ -282,6 +282,7 @@ function resetGame() {
   timeDisplay.classList.remove('pulse');
   roundDisplay.textContent = 1;
   lastTextIndex = -1;
+  textDisplay.style.filter = 'blur(0)';
   startSubtitleAnimation();
 
   textDisplay.style.transform = 'scale(0.9)';
