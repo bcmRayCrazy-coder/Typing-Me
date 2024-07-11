@@ -54,7 +54,12 @@
                 <button id="reset-btn" class="btn">Reset</button>
             </div>
         </div>
-        <button id="settings-btn" class="btn">Settings</button>
+        <div class="top-group">
+            <span id="status" class="status secondary">Offline</span>
+            <button id="ranks-btn" class="btn" disabled>Ranks</button>
+            <button id="settings-btn" class="btn">Settings</button>
+        </div>
+        <!-- Modals -->
         <div id="settings-modal" class="modal">
             <div class="modal-content">
                 <span class="close">&times;</span>
@@ -92,12 +97,25 @@
                 <h2>Your name</h2>
                 <div class="name-item">
                     <label for="name-field">Please enter your name</label>
-                    <input type="text" id="name-field" placeholder="Enter your name here" maxlength="24" />
+                    <input
+                        type="text"
+                        id="name-field"
+                        placeholder="Enter your name here"
+                        maxlength="24"
+                    />
                     <div class="btn-group">
-                        <button id="guest-btn" class="btn">Guest Mode</button>
-                        <button id="confirm-btn" class="btn" disabled>Confirm</button>
+                        <!-- Guest mode changed to offline mode -->
+                        <button id="guest-btn" class="btn">Offline Mode</button>
+                        <button id="confirm-btn" class="btn" disabled>
+                            Confirm
+                        </button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="rank-modal" class="modal">
+            <div class="modal-content">
+                <h2>Ranks</h2>
             </div>
         </div>
         <footer>

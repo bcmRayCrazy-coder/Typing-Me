@@ -12,6 +12,7 @@ const settingsBtn = document.querySelector('#settings-btn');
 const settingsCloseBtn = settingsModal.querySelector('.close');
 const guestBtn = document.querySelector('#guest-btn');
 const confirmNameBtn = document.querySelector('#confirm-btn');
+const ranksBtn = document.querySelector('#ranks-btn');
 // Displays
 const title = document.querySelector('#title');
 const subtitle = document.querySelector('#subtitle');
@@ -25,6 +26,7 @@ const wpmDisplay = document.querySelector('#wpm');
 const accuracyDisplay = document.querySelector('#accuracy');
 const timeDisplay = document.querySelector('#time');
 const roundDisplay = document.querySelector('#round');
+const statusDisplay = document.querySelector('#status');
 // Forms
 const languageSelect = document.querySelector('#language-select');
 const showPinyinCheckbox = document.querySelector('#show-pinyin');
@@ -211,6 +213,14 @@ const uiText = {
         dark: 'Dark',
         timeUp: "Time's Up!",
         greatJob: 'Great Job!',
+        ranks: 'Ranks',
+        status: {
+            offline: 'Offline',
+            online: 'Online',
+            uploading: 'Uploading',
+            success: 'Success',
+            error: 'Failed',
+        },
     },
     zh: {
         title: '键入我境',
@@ -235,6 +245,14 @@ const uiText = {
         dark: '深色',
         timeUp: '时间到！',
         greatJob: '干得好！',
+        ranks: '排行',
+        status: {
+            offline: '离线',
+            online: '在线',
+            uploading: '上传中',
+            success: '成功',
+            error: '失败',
+        },
     },
     ja: {
         title: 'タイプ道',
@@ -259,8 +277,18 @@ const uiText = {
         dark: 'ダーク',
         timeUp: '時間切れ！',
         greatJob: 'よくできました！',
+        ranks: 'ランキング',
+        status: {
+            offline: 'オフライン',
+            online: 'オンライン',
+            uploading: 'アップロード中',
+            success: '成功',
+            error: '失敗',
+        },
     },
 };
+
+const statusColors = ['primary', 'secondary', 'success', 'warning', 'error'];
 
 let currentText = '';
 let currentPinyin = '';
@@ -281,6 +309,7 @@ let showPinyin = true;
 let currentTheme = 'auto';
 let username = '';
 let offlineMode = true;
+let currentStatus = 'offline';
 
 document.addEventListener('copy', (e) => e.preventDefault());
 document.addEventListener('paste', (e) => e.preventDefault());
@@ -299,25 +328,29 @@ function closeModal(element) {
 }
 
 function updateUILanguage() {
-    title.textContent = uiText[currentLanguage].title;
-    startBtn.textContent = uiText[currentLanguage].start;
-    pauseBtn.textContent = uiText[currentLanguage].pause;
-    resetBtn.textContent = uiText[currentLanguage].reset;
-    wpmLabel.textContent = uiText[currentLanguage].wpm;
-    accuracyLabel.textContent = uiText[currentLanguage].accuracy;
-    timeLabel.textContent = uiText[currentLanguage].timeLeft;
-    roundLabel.textContent = uiText[currentLanguage].round;
-    inputField.placeholder = uiText[currentLanguage].placeholder;
-    settingsBtn.textContent = uiText[currentLanguage].settings;
+    const currentLanguageUiText = uiText[currentLanguage];
+    title.textContent = currentLanguageUiText.title;
+    startBtn.textContent = currentLanguageUiText.start;
+    pauseBtn.textContent = currentLanguageUiText.pause;
+    resetBtn.textContent = currentLanguageUiText.reset;
+    wpmLabel.textContent = currentLanguageUiText.wpm;
+    accuracyLabel.textContent = currentLanguageUiText.accuracy;
+    timeLabel.textContent = currentLanguageUiText.timeLeft;
+    roundLabel.textContent = currentLanguageUiText.round;
+    inputField.placeholder = currentLanguageUiText.placeholder;
+    settingsBtn.textContent = currentLanguageUiText.settings;
+    ranksBtn.textContent = currentLanguageUiText.ranks;
+    statusDisplay.textContent = currentLanguageUiText.status[currentStatus];
+
     document.querySelector('label[for="show-pinyin"]').textContent =
-        uiText[currentLanguage].showPinyin;
+        currentLanguageUiText.showPinyin;
     document.querySelector('label[for="time-limit"]').textContent =
-        uiText[currentLanguage].timeLimit;
+        currentLanguageUiText.timeLimit;
     document.querySelector('label[for="theme-select"]').textContent =
-        uiText[currentLanguage].theme;
-    themeSelect.options[0].textContent = uiText[currentLanguage].auto;
-    themeSelect.options[1].textContent = uiText[currentLanguage].light;
-    themeSelect.options[2].textContent = uiText[currentLanguage].dark;
+        currentLanguageUiText.theme;
+    themeSelect.options[0].textContent = currentLanguageUiText.auto;
+    themeSelect.options[1].textContent = currentLanguageUiText.light;
+    themeSelect.options[2].textContent = currentLanguageUiText.dark;
     startSubtitleAnimation();
 }
 
@@ -365,17 +398,29 @@ function stopSubtitleAnimation() {
     subtitle.textContent = '';
 }
 
+function setStatus(newStatus, color) {
+    currentStatus = newStatus;
+    statusDisplay.textContent = uiText[currentLanguage].status[currentStatus];
+    statusDisplay.classList.forEach((val) => {
+        if (statusColors.includes(val)) statusDisplay.classList.remove(val);
+    });
+    statusDisplay.classList.add(color);
+}
+
 function initUserWeb() {
     offlineMode = false;
+    setStatus('online', 'success');
 
     guestBtn.addEventListener('click', function () {
+        alert("Online Functions won't be avaliable under Offline Mode");
         closeModal(nameModal);
-        alert("Rank won't be uploaded to server under guest mode");
+        setStatus('offline', 'secondary');
     });
     confirmNameBtn.addEventListener('click', function () {
         if (username.length <= 0 || username.length > 24)
             return alert('Name too long or too short!');
         closeModal(nameModal);
+        ranksBtn.disabled = false;
     });
 
     nameField.addEventListener('input', function () {
@@ -499,13 +544,14 @@ function initGame() {
 
     function uploadRank() {
         console.log(
-            'Uploading rank time:',
+            'Uploading score. Time:',
             endTime - startTime,
             ', user:',
             username,
             ', text:',
             currentText
         );
+        setStatus('uploading', 'primary');
         fetch(ServerUrl + '/upload', {
             method: 'post',
             headers: {
@@ -519,12 +565,13 @@ function initGame() {
         })
             .then(async (value) => {
                 const response = await value.json();
-                if (!response.ok) alert('Rank upload failed!');
+                if (!response.ok) setStatus('error', 'error');
+                else setStatus('success', 'success');
             })
             .catch((err) => {
                 if (!err) return;
                 console.error(err);
-                alert('Rank upload failed:\n' + err);
+                setStatus('error', 'error');
             });
     }
 

@@ -308,8 +308,7 @@ footer {
     animation-fill-mode: forwards;
 }
 
-#settings-btn {
-    background-color: var(--primary-color);
+.top-group {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -317,6 +316,45 @@ footer {
     animation: fadeIn 0.5s ease-out 1.4s;
     opacity: 0;
     animation-fill-mode: forwards;
+}
+
+.top-group .status {
+    color: var(--text-color);
+    padding: 4px;
+    padding-inline: 8px;
+    border-radius: 16px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+}
+
+.top-group .status:hover {
+    opacity: 1;
+    margin-right: 12px;
+}
+
+.status.success {
+    background-color: var(--success-color);
+}
+.status.secondary {
+    background-color: var(--secondary-color);
+}
+.status.primary {
+    background-color: var(--primary-color);
+}
+.status.warning {
+    background-color: var(--warning-color);
+}
+.status.error {
+    background-color: var(--error-color);
+}
+
+#settings-btn {
+    background-color: var(--primary-color);
+}
+
+#ranks-btn {
+    background-color: var(--warning-color);
 }
 
 .modal {
@@ -459,6 +497,12 @@ input:checked + .slider:before {
 
 .setting-item input[type='number'] {
     width: 80px;
+}
+
+#name-modal {
+    animation: fadeIn 0.5s ease-out 1.6s;
+    opacity: 0;
+    animation-fill-mode: forwards;
 }
 
 .name-item input#name-field {
