@@ -132,7 +132,7 @@ function initWeb() {
         }
     );
 
-    fastify.listen({ port: 1293 }, (err) => {
+    fastify.listen({ port: 1293, host: '0.0.0.0' }, (err) => {
         if (err) {
             fastify.log.error(err);
             process.exit(1);
