@@ -8,6 +8,9 @@
     --success-color: #34c759;
     --warning-color: #ff9500;
     --container-bg: rgba(255, 255, 255, 0.8);
+    --rank-first-bg: #ffdb00;
+    --rank-second-bg: #00d800;
+    --rank-third-bg: #0096ea;
 }
 
 body {
@@ -537,6 +540,38 @@ input:checked + .slider:before {
 
 .name-item .btn-group #confirm-btn {
     background-color: var(--success-color);
+}
+
+.rank-table {
+    color: var(--text-color);
+    overflow: scroll;
+    height: min-content;
+}
+
+.rank-table #rank-table-data {
+    width: 100%;
+    text-align: center;
+}
+
+.rank-table .table-header {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.rank-table .table-header th {
+    border-radius: 4px;
+}
+
+.rank-table table tr:nth-child(2) {
+    color: var(--rank-first-bg);
+}
+
+.rank-table table tr:nth-child(3) {
+    color: var(--rank-second-bg);
+}
+
+.rank-table table tr:nth-child(4) {
+    color: var(--rank-third-bg);
 }
 
 body.dark-mode {

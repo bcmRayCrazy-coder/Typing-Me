@@ -25,7 +25,7 @@ async function initDatabase() {
             builder.string('username');
             builder.integer('wpm');
             builder.string('text');
-            builder.timestamp('upload_time').defaultTo(knex.fn.now());
+            builder.integer('upload_time').defaultTo(knex.fn.now());
         });
     }
     if (!(await knex.schema.hasTable('cheats'))) {
@@ -34,7 +34,7 @@ async function initDatabase() {
             builder.increments('id');
             builder.string('username');
             builder.integer('wpm');
-            builder.timestamp('upload_time').defaultTo(knex.fn.now());
+            builder.integer('upload_time').defaultTo(knex.fn.now());
         });
     }
 }
@@ -128,7 +128,7 @@ function initWeb() {
                 .orderBy('wpm', request.query.orderAsc ? 'asc' : 'desc');
             if (request.query.limit) query.limit(request.query.limit);
             if (request.query.offset) query.offset(request.query.offset);
-            return await query;
+            return { data: await query };
         }
     );
 

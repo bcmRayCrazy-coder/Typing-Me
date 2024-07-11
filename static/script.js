@@ -4,6 +4,7 @@ const ServerUrl = 'http://127.0.0.1:1293';
 // Modals
 const settingsModal = document.querySelector('#settings-modal');
 const nameModal = document.querySelector('#name-modal');
+const ranksModal = document.querySelector('#rank-modal');
 // Buttons
 const startBtn = document.querySelector('#start-btn');
 const pauseBtn = document.querySelector('#pause-btn');
@@ -13,13 +14,8 @@ const settingsCloseBtn = settingsModal.querySelector('.close');
 const guestBtn = document.querySelector('#guest-btn');
 const confirmNameBtn = document.querySelector('#confirm-btn');
 const ranksBtn = document.querySelector('#ranks-btn');
+const ranksCloseBtn = ranksModal.querySelector('.close');
 // Displays
-const title = document.querySelector('#title');
-const subtitle = document.querySelector('#subtitle');
-const wpmLabel = document.querySelector('#wpm-label');
-const accuracyLabel = document.querySelector('#accuracy-label');
-const timeLabel = document.querySelector('#time-label');
-const roundLabel = document.querySelector('#round-label');
 const textDisplay = document.querySelector('#text-display');
 const pinyinDisplay = document.querySelector('#pinyin-display');
 const wpmDisplay = document.querySelector('#wpm');
@@ -34,11 +30,11 @@ const timeLimitInput = document.querySelector('#time-limit');
 const themeSelect = document.querySelector('#theme-select');
 const inputField = document.querySelector('#input-field');
 const nameField = document.querySelector('#name-field');
-// Popups
+// Overlays
 const failureOverlay = document.querySelector('#failure-overlay');
-const failureMessage = document.querySelector('#failure-message');
 const successOverlay = document.querySelector('#success-overlay');
-const successMessage = document.querySelector('#success-message');
+// Tables
+const ranksTable = document.querySelector('#rank-table-data');
 
 const texts = {
     en: [
@@ -221,6 +217,11 @@ const uiText = {
             success: 'Success',
             error: 'Failed',
         },
+        thRank: 'Rank',
+        thName: 'Name',
+        thWpm: 'WPM',
+        thText: 'Content',
+        thTime: 'Time',
     },
     zh: {
         title: '键入我境',
@@ -253,6 +254,11 @@ const uiText = {
             success: '成功',
             error: '失败',
         },
+        thRank: '排名',
+        thName: '昵称',
+        thWpm: 'WPM',
+        thText: '内容',
+        thTime: '时间',
     },
     ja: {
         title: 'タイプ道',
@@ -285,6 +291,11 @@ const uiText = {
             success: '成功',
             error: '失敗',
         },
+        thRank: 'Rank',
+        thName: 'Name',
+        thWpm: 'WPM',
+        thText: 'Content',
+        thTime: 'Time',
     },
 };
 
@@ -329,25 +340,12 @@ function closeModal(element) {
 
 function updateUILanguage() {
     const currentLanguageUiText = uiText[currentLanguage];
-    title.textContent = currentLanguageUiText.title;
-    startBtn.textContent = currentLanguageUiText.start;
-    pauseBtn.textContent = currentLanguageUiText.pause;
-    resetBtn.textContent = currentLanguageUiText.reset;
-    wpmLabel.textContent = currentLanguageUiText.wpm;
-    accuracyLabel.textContent = currentLanguageUiText.accuracy;
-    timeLabel.textContent = currentLanguageUiText.timeLeft;
-    roundLabel.textContent = currentLanguageUiText.round;
-    inputField.placeholder = currentLanguageUiText.placeholder;
-    settingsBtn.textContent = currentLanguageUiText.settings;
-    ranksBtn.textContent = currentLanguageUiText.ranks;
+    document.querySelectorAll('*').forEach((el) => {
+        if (el.dataset && el.dataset.i18n)
+            el.textContent = currentLanguageUiText[el.dataset.i18n];
+    });
     statusDisplay.textContent = currentLanguageUiText.status[currentStatus];
 
-    document.querySelector('label[for="show-pinyin"]').textContent =
-        currentLanguageUiText.showPinyin;
-    document.querySelector('label[for="time-limit"]').textContent =
-        currentLanguageUiText.timeLimit;
-    document.querySelector('label[for="theme-select"]').textContent =
-        currentLanguageUiText.theme;
     themeSelect.options[0].textContent = currentLanguageUiText.auto;
     themeSelect.options[1].textContent = currentLanguageUiText.light;
     themeSelect.options[2].textContent = currentLanguageUiText.dark;
@@ -405,6 +403,41 @@ function setStatus(newStatus, color) {
         if (statusColors.includes(val)) statusDisplay.classList.remove(val);
     });
     statusDisplay.classList.add(color);
+}
+
+function formatTimestamp(timestamp) {
+    var date = new Date(timestamp);
+
+    var year = date.getFullYear();
+    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+    var day = date.getDate().toString().padStart(2, '0');
+    var hours = date.getHours().toString().padStart(2, '0');
+    var minutes = date.getMinutes().toString().padStart(2, '0');
+    var seconds = date.getSeconds().toString().padStart(2, '0');
+
+    return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+}
+
+function addRank(data, index) {
+    const rankElement = document.createElement('td');
+    const nameElement = document.createElement('td');
+    const wpmElement = document.createElement('td');
+    const textElement = document.createElement('td');
+    const timeElement = document.createElement('td');
+    rankElement.textContent = index + 1;
+    nameElement.textContent = data.username;
+    wpmElement.textContent = data.wpm;
+    textElement.textContent = data.text;
+    timeElement.textContent = formatTimestamp(data.upload_time);
+
+    const rowElement = document.createElement('tr');
+    rowElement.appendChild(rankElement);
+    rowElement.appendChild(nameElement);
+    rowElement.appendChild(wpmElement);
+    rowElement.appendChild(textElement);
+    rowElement.appendChild(timeElement);
+
+    ranksTable.appendChild(rowElement);
 }
 
 function initUserWeb() {
@@ -617,7 +650,6 @@ function initGame() {
     }
 
     function showSuccessAnimation() {
-        successMessage.textContent = uiText[currentLanguage].greatJob;
         successOverlay.style.opacity = '1';
         successOverlay.style.pointerEvents = 'auto';
 
@@ -632,7 +664,6 @@ function initGame() {
     }
 
     function showFailureAnimation() {
-        failureMessage.textContent = uiText[currentLanguage].timeUp;
         failureOverlay.style.opacity = '1';
         failureOverlay.style.pointerEvents = 'auto';
 
@@ -779,6 +810,13 @@ function initGame() {
 }
 
 function initUI() {
+    async function uploadRankTable() {
+        const currentLanguageUiText = uiText[currentLanguage];
+        ranksTable.innerHTML = `<tr class="table-header"><th id="rank-header">${currentLanguageUiText.thRank}</th><th id="name-header">${currentLanguageUiText.thName}</th><th id="wpm-header">${currentLanguageUiText.thWpm}</th><th id="text-header">${currentLanguageUiText.thText}</th><th id="time-header">${currentLanguageUiText.thTime}</th></tr>`;
+        const response = await (await fetch(ServerUrl + '/ranks')).json();
+        response.data.forEach((data, index) => addRank(data, index));
+    }
+
     settingsBtn.onclick = function () {
         openModal(settingsModal);
     };
@@ -787,9 +825,27 @@ function initUI() {
         closeModal(settingsModal);
     };
 
+    ranksBtn.onclick = function () {
+        openModal(ranksModal);
+        uploadRankTable();
+    };
+
+    ranksCloseBtn.onclick = function () {
+        closeModal(ranksModal);
+    };
+
     window.onclick = function (event) {
-        if (event.target == settingsModal) {
-            closeModal(settingsModal);
+        switch (event.target) {
+            case settingsModal:
+                closeModal(settingsModal);
+                break;
+
+            case ranksModal:
+                closeModal(ranksModal);
+                break;
+
+            default:
+                break;
         }
     };
 
@@ -829,6 +885,7 @@ function initUI() {
 
     updateUILanguage();
     applyTheme();
+    uploadRankTable();
 }
 
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
